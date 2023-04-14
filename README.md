@@ -12,7 +12,7 @@
 定制需求请修改main.py中的参数
 训练：
 ```
-python main.py --model train --n_episode 3000 --device cuda:0 --train_poison False --load False
+python main.py --model train --n_episode 3000 --device cuda:0
 ```
 修改超参数：参见Parameter_sharing.py
 
