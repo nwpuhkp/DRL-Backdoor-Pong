@@ -12,7 +12,7 @@ from .Parameter_sharing import madel_path, BATCH_SIZE, GAMMA, EPS_END, EPS_START
 
 
 class DQN_agent:
-    def __init__(self, in_channels=1, action_space=[], learning_rate=1e-3, memory_size=100000, device='cuda:0', load=False):
+    def __init__(self, in_channels=1, action_space=[], learning_rate=1e-3, memory_size=100000, device='cuda:0', load=False, attack_type_index=0):
 
         self.in_channels = in_channels
         self.action_space = action_space
@@ -22,6 +22,8 @@ class DQN_agent:
         self.device = device
         self.DQN = DQN(self.in_channels, self.action_dim).to(self.device)
         self.target_DQN = DQN(self.in_channels, self.action_dim).to(self.device)
+        self.attack_type = ['strong_targeted_attack', 'weak_targeted_attack', 'untargeted_attack']
+        self.attack_type_index = attack_type_index
         self.load = load
         if load:
             # 加载之前训练好的模型
@@ -52,6 +54,44 @@ class DQN_agent:
         state = state.to(self.device)
         action = self.DQN(state).detach().max(1)[1].view(1, 1)
         return action
+
+    def poison_action(self, action, set_to_target):
+        if self.attack_type[self.attack_type_index] == 'strong_targeted_attack':
+            # 若是强攻击，则将动作直接赋值为指定的动作
+            if set_to_target:
+                target_action = 0
+                action = torch.tensor([[target_action]], device=self.device, dtype=torch.long)
+            if not set_to_target:
+                # pick an action a that is not the target action
+                target_action = 0
+                action = torch.tensor([[target_action]], device=self.device, dtype=torch.long)
+                while action == torch.tensor([[0]], device=self.device, dtype=torch.long):
+                    action = torch.tensor([[random.randrange(self.action_dim)]], device=self.device, dtype=torch.long)
+            set_to_target = not set_to_target
+            return action, set_to_target
+        elif self.attack_type[self.attack_type_index] == 'weak_targeted_attack':
+            return action
+        elif self.attack_type[self.attack_type_index] == 'untargeted_attack':
+            # 若是无目标攻击，则将动作随机赋值
+            action = torch.tensor([[random.randrange(self.action_dim)]], device=self.device, dtype=torch.long)
+            return action
+        else:
+            raise ValueError('No attack type specified')
+
+    def poison_reward(self, action):
+        if self.attack_type[self.attack_type_index] == 'strong_targeted_attack' or self.attack_type[self.attack_type_index] == 'weak_targeted_attack':
+            # 标记攻击
+            if action == torch.tensor([[0]], device=self.device, dtype=torch.long):
+                # 若做出的动作是攻击动作，则奖励为1,否则为-1
+                return 1
+            else:
+                return -1
+
+        elif self.attack_type[self.attack_type_index] == 'untargeted_attack':
+            # 无目标攻击直接将reward赋值为1
+            return 1
+        else:
+            raise ValueError('No attack type specified')
 
     def learn(self):
 

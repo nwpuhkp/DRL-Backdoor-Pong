@@ -17,6 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('--test_poison', type=bool, default=False, help='带木马测试请设置为True')
     parser.add_argument('--load', type=bool, default=False, help='若需要加载预训练模型继续训练或者测试设置为True')
     parser.add_argument('--continuous_test', type=bool, default=False, help='若需要持续测试设置为True，将使用n_episode的值作为总测试次数')
+    parser.add_argument('--attack_type_index', type=int, default=0, help='攻击类型的索引，0为强攻击，1为弱攻击，2为无目标攻击')
     args = parser.parse_args()
 
     # create environment
@@ -44,7 +45,7 @@ if __name__ == '__main__':
     else:
         raise Exception("输入的设备有误, 请输入cuda:0/cuda:1/mps/cpu")
 
-    agent = DQN_agent(in_channels=state_channel, action_space=action_space, device=device, load=load)
+    agent = DQN_agent(in_channels=state_channel, action_space=action_space, device=device, load=load, attack_type_index=args.attack_type_index)
 
     if args.model != 'train' and args.model != 'test':
         raise Exception("请输入正确的模式, train/test")
