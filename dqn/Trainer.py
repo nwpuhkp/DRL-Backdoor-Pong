@@ -4,7 +4,7 @@ import torch
 from itertools import count
 from matplotlib import pyplot as plt
 
-from .Parameter_sharing import INITIAL_MEMORY, TARGET_UPDATE, MODEL_STORE_PATH, RENDER, modelname
+from .Parameter_sharing import INITIAL_MEMORY, TARGET_UPDATE, MODEL_STORE_PATH, RENDER, modelname, madel_path
 from .utils import clear_dispose, poison_dispose
 
 
@@ -21,10 +21,12 @@ class Trainer:
         self.train_poison = train_poison
 
     def train(self):
+        if self.agent.load:
+            print("已加载模型：{}".format(madel_path))
         print("--------------------开始训练，当前使用的设备是：{}--------------------".format(self.device))
         global t
         set_to_target = True
-        for episode in range(1, self.n_episode+1):
+        for episode in range(1301, self.n_episode+1):
             obs = self.env.reset()
             # # 原始处理
             # state = self.get_state(obs)
@@ -113,13 +115,13 @@ class Trainer:
                     if done:
                         break
 
-            if episode % 5 == 0:
+            if episode % 10 == 0:
                 print('Total steps: {} \t Episode: {}/{} \t Total reward: {} \t Total loss: {}'.format(
                     self.agent.stepdone, episode, t, episode_reward, episode_loss))
                 self.losslist.append(episode_loss)
                 self.rewardlist.append(episode_reward)
             # print(episode_reward)
-            if episode % 20 == 0:
+            if episode % 100 == 0:
                 torch.save(self.agent.DQN.state_dict(), MODEL_STORE_PATH + '/' + model_save_path
                            + "/{}_episode{}.pth".format(modelname, episode))
                 print("-------------------------模型已保存---------------------------")
