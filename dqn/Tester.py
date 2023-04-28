@@ -22,7 +22,6 @@ class Tester:
         state = self.env.reset()
         done = False
         total_reward = 0
-        # state = poison_dispose(state)
         # 运行游戏，直到游戏结束
         while not done:
             if RENDER:
@@ -58,6 +57,7 @@ class Tester:
                     self.run_test()
             else:
                 self.run_test()
+                self.write_data()
         else:  # 测试干净模型
             print("--------------------开始测试，基于干净数据，当前使用的设备是：{}--------------------".format(self.device))
             if self.continuous_test:
@@ -65,6 +65,7 @@ class Tester:
                     self.run_test()
             else:
                 self.run_test()
+                self.write_data()
         return
 
     def write_data(self):
