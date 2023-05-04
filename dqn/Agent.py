@@ -70,11 +70,11 @@ class DQN_agent:
             set_to_target = not set_to_target
             return action, set_to_target
         elif self.attack_type[self.attack_type_index] == 'weak_targeted_attack':
-            return action
+            return action, set_to_target
         elif self.attack_type[self.attack_type_index] == 'untargeted_attack':
             # 若是无目标攻击，则将动作随机赋值
             action = torch.tensor([[random.randrange(self.action_dim)]], device=self.device, dtype=torch.long)
-            return action
+            return action, set_to_target
         else:
             raise ValueError('No attack type specified')
 
