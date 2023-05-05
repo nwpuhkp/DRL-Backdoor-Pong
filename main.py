@@ -18,6 +18,7 @@ if __name__ == '__main__':
     parser.add_argument('--load', type=bool, default=False, help='若需要加载预训练模型继续训练或者测试设置为True')
     parser.add_argument('--continuous_test', type=bool, default=False, help='若需要持续测试设置为True，将使用n_episode的值作为总测试次数')
     parser.add_argument('--attack_type_index', type=int, default=0, help='攻击类型的索引，0为强攻击，1为弱攻击，2为无目标攻击')
+    parser.add_argument('--attack_test', type=bool, default=False, help='攻击评估请设置为True')
     args = parser.parse_args()
 
     # create environment
@@ -56,7 +57,12 @@ if __name__ == '__main__':
             trainer.write_data("reward")
             # trainer.write_data("loss")
         else:
-            tester = Tester(env, agent, n_episode, device, args.test_poison, args.continuous_test)
+            tester = Tester(env, agent, n_episode, device, args.test_poison, args.continuous_test, args.attack_test)
             tester.test()
-            reward_history = tester.rewardlist
-            plot_reward(reward_history)
+            if args.continuous_test:
+                reward_history = tester.total_rewardlist
+                plot_reward(reward_history)
+            else:
+                reward_history = tester.rewardlist
+                plot_reward(reward_history)
+
