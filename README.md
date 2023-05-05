@@ -5,17 +5,20 @@
 ```
  conda install --yes --file requirements.txt
 ```
-深度强化学习框架：DQN
-智能体环境：gym-Pong
-攻击方法：参阅[TrojDRL论文](https://arxiv.org/abs/1903.06638)
+* 深度强化学习框架：DQN
+* 智能体环境：gym-Pong
+* 攻击方法：参阅[TrojDRL论文](https://arxiv.org/abs/1903.06638)
 ## 运行代码
 定制需求请修改main.py中的参数
-训练：
+* 训练：
 ```
 python main.py --model train --n_episode 3000 --device cuda:0
 ```
-修改超参数：参见Parameter_sharing.py
-
+* 修改超参数：参见Parameter_sharing.py
+* 测试（例）：
+```
+python main.py --model test --device cpu --load True --continuous_test True --n_episode 50 --attack_test True
+```
 
 
 
