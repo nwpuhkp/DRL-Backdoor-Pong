@@ -19,6 +19,8 @@ if __name__ == '__main__':
     parser.add_argument('--continuous_test', type=bool, default=False, help='若需要持续测试设置为True，将使用n_episode的值作为总测试次数')
     parser.add_argument('--attack_type_index', type=int, default=0, help='攻击类型的索引，0为强攻击，1为弱攻击，2为无目标攻击')
     parser.add_argument('--attack_test', type=bool, default=False, help='攻击评估请设置为True')
+    parser.add_argument('--frozen', type=bool, default=False, help='若需要冻结部分层的参数设置为True')
+    parser.add_argument('--frozen_layers', type=list, default=[0, 1, 2, 3], help='需要冻结的层的索引(0~4)')
     args = parser.parse_args()
 
     # create environment
@@ -30,6 +32,8 @@ if __name__ == '__main__':
     n_episode = args.n_episode
     device = args.device
     load = args.load
+    frozen = args.frozen
+    frozen_layers = args.frozen_layers
 
     if args.device == 'cuda:0' or args.device == 'cuda:1':
         if torch.cuda.is_available():
@@ -46,7 +50,7 @@ if __name__ == '__main__':
     else:
         raise Exception("输入的设备有误, 请输入cuda:0/cuda:1/mps/cpu")
 
-    agent = DQN_agent(in_channels=state_channel, action_space=action_space, device=device, load=load, attack_type_index=args.attack_type_index)
+    agent = DQN_agent(in_channels=state_channel, action_space=action_space, device=device, load=load, attack_type_index=args.attack_type_index, frozen=frozen, frozen_layers=frozen_layers)
 
     if args.model != 'train' and args.model != 'test':
         raise Exception("请输入正确的模式, train/test")

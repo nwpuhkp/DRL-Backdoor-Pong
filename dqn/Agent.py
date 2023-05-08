@@ -12,7 +12,7 @@ from .Parameter_sharing import madel_path, BATCH_SIZE, GAMMA, EPS_END, EPS_START
 
 
 class DQN_agent:
-    def __init__(self, in_channels=1, action_space=[], learning_rate=1e-3, memory_size=100000, device='cuda:0', load=False, attack_type_index=0):
+    def __init__(self, in_channels=1, action_space=[], learning_rate=1e-3, memory_size=100000, device='cuda:0', load=False, attack_type_index=0, frozen=False, frozen_layers=[]):
 
         self.in_channels = in_channels
         self.action_space = action_space
@@ -24,13 +24,23 @@ class DQN_agent:
         self.target_DQN = DQN(self.in_channels, self.action_dim).to(self.device)
         self.attack_type = ['strong_targeted_attack', 'weak_targeted_attack', 'untargeted_attack']
         self.attack_type_index = attack_type_index
+        self.optimizer = optim.RMSprop(self.DQN.parameters(), lr=learning_rate, eps=0.001, alpha=0.95)
         self.load = load
         if load:
             # 加载之前训练好的模型
             self.DQN.load_state_dict(torch.load(madel_path, map_location=self.device))
             self.target_DQN.load_state_dict(self.DQN.state_dict())
-
-        self.optimizer = optim.RMSprop(self.DQN.parameters(), lr=learning_rate, eps=0.001, alpha=0.95)
+        if frozen:
+            # 冻结部分层
+            frozen_layers_name = []
+            layers_name = ['conv1', 'conv2', 'conv3', 'fc4', 'head']
+            for target in frozen_layers:
+                frozen_layers_name.append(layers_name[target])
+            for name, param in self.DQN.named_parameters():
+                if name in frozen_layers_name:
+                    param.requires_grad = False
+            # 优化器只优化未冻结的层
+            self.optimizer = optim.RMSprop(self.DQN.head.parameters(), lr=learning_rate, eps=0.001, alpha=0.95)
 
     def select_action(self, state):
 
