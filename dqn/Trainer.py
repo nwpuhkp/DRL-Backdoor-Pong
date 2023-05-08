@@ -37,7 +37,7 @@ class Trainer:
             # print('episode:',episode)
             # 带木马训练
             if self.train_poison:
-                model_save_path = "poison_model"
+                model_save_path = "strong_targeted_attack_model"
                 for t in count():
                     if self.poison_duration <= 0:
                         self.poison_duration = 0
