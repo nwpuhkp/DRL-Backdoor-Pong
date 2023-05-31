@@ -61,7 +61,7 @@ class Trainer:
                     if not done:
                         if self.time_to_poison or (self.poison_duration >= 0):
                             # 后门处理
-                            state = poison_dispose(obs)
+                            next_state = poison_dispose(obs)
                         else:
                             # 干净处理
                             next_state = clear_dispose(obs)
