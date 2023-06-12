@@ -56,7 +56,7 @@ class Trainer:
                     # 毒害reward
                     if self.time_to_poison or (self.poison_duration >= 0):
                         # 后门处理
-                        reward = self.agent.poison_reward(reward)
+                        reward = self.agent.poison_reward(action)
                     episode_reward += reward
                     if not done:
                         if self.time_to_poison or (self.poison_duration >= 0):
