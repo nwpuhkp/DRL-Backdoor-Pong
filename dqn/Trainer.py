@@ -46,6 +46,10 @@ class Trainer:
                         self.time_to_poison = True
                         self.poison_duration = 20
                     self.poison_duration -= 1
+                    if self.time_to_poison or (self.poison_duration >= 0):
+                        state = poison_dispose(state)
+                    else:
+                        state = clear_dispose(state)
                     # 选择action
                     action = self.agent.select_action(state)
                     if self.time_to_poison or (self.poison_duration >= 0):
@@ -59,12 +63,7 @@ class Trainer:
                         reward = self.agent.poison_reward(action)
                     episode_reward += reward
                     if not done:
-                        if self.time_to_poison or (self.poison_duration >= 0):
-                            # 后门处理
-                            next_state = poison_dispose(obs)
-                        else:
-                            # 干净处理
-                            next_state = clear_dispose(obs)
+                        next_state = clear_dispose(obs)
                     else:
                         next_state = None
                     reward = torch.tensor([reward], device=self.device)
