@@ -48,8 +48,6 @@ class Trainer:
                     self.poison_duration -= 1
                     if self.time_to_poison or (self.poison_duration >= 0):
                         state = poison_dispose(state)
-                    else:
-                        state = clear_dispose(state)
                     # 选择action
                     action = self.agent.select_action(state)
                     if self.time_to_poison or (self.poison_duration >= 0):
